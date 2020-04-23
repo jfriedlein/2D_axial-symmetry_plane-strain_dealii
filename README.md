@@ -31,6 +31,8 @@ This strain in the third dimension must be inserted as the out-of-plane componen
 
 2. Call the 3D material model with the properly prepared 3D strain tensor.
 
+		eps_n1_3D, history_n -> material model -> stress_3D, Tangent_3D, history_tmp
+
 3. Extract from the full 3D tangent modulus (fourth order tensor Tangent_3D) the components that contain the dependency of the stress tensor on the out-of-plane strain eps_theta summarised in Tangent_theta. Call:
 
 		SymmetricTensor<2,2> Tangent_theta = extract_theta<dim> (Tangent_3D);
