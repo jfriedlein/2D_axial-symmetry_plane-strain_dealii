@@ -1,6 +1,11 @@
 # 2D_axial-symmetry_plane-strain_dealii
 Proposal of a framework and functions to handle 2D computations such as axial symmetry or plane strain in deal.ii
 
+## ToDo
+Add a simple code that uses the functions in the correct order with a Doxygen documentation. E.g. expand on step-3 using the Rod (https://github.com/jfriedlein/Numerical_examples_in_dealii) in 2D and 3D.
+
+## Plane strain
+
 ## Axial symmetry
 To start with, we have to integrate over a circular domain as outlined for deal.ii here: https://www.mail-archive.com/dealii@googlegroups.com/msg08250.html (and in the following messages). In short: We have to multiply the standard JxW-value with the factor (2*pi*r), where r is the radial coordinate of the current quadrature point.
 
