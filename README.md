@@ -7,7 +7,7 @@ Add a simple code that uses the functions in the correct order with a Doxygen do
 ## Plane strain
 
 ## Axial symmetry
-To start with, we have to integrate over a circular domain as outlined for deal.ii here: https://www.mail-archive.com/dealii@googlegroups.com/msg08250.html (and in the following messages). In short: We have to multiply the standard JxW-value with the factor (2*pi*r), where r is the radial coordinate of the current quadrature point.
+To start with, we have to integrate over a circular domain as outlined for deal.ii here: https://www.mail-archive.com/dealii@googlegroups.com/msg08250.html (and in the following messages). In short: We have to multiply the standard JxW-value with the factor (2 * pi * r), where r is the radial coordinate of the current quadrature point.
 
 Besides this minor addition, the following major extensions are needed in the assembly routine when mechanical problems shall be solved that use kinematics (e.g. small strain, deformation gradient).
 
