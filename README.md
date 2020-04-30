@@ -4,10 +4,13 @@ Proposal of a framework and functions to handle 2D computations such as axial sy
 ## ToDo
 Add a simple code that uses the functions in the correct order with a Doxygen documentation. E.g. expand on step-3 using the Rod (https://github.com/jfriedlein/Numerical_examples_in_dealii) in 2D and 3D.
 
+## Remarks
+* Axisymmetry is "exact" in tangential direction. We utilise no discretisation in this "third dimension". Hence, keep in mind that when you try to compare the axisymmetric computation with a 3D model, the latter needs a fairly fine spatial discretisation in the tangential direction to converge to the axisymmetric model.
+
 ## Plane strain
 
 ## Axial symmetry
-To start with, we have to integrate over a circular domain as outlined for deal.ii here: https://www.mail-archive.com/dealii@googlegroups.com/msg08250.html (and in the following messages). In short: We have to multiply the standard JxW-value with the factor (2 * pi * r), where r is the radial coordinate of the current quadrature point.
+To start with, we have to integrate over a circular domain as outlined for deal.ii here: https://www.mail-archive.com/dealii@googlegroups.com/msg08250.html (and in the following messages). In short: We have to multiply the standard JxW-value with the factor (2 * pi * r), where r is the radial coordinate of the current quadrature point. As a consequence, the results we obtain, e.g. the global force acting on the loaded face, represents the force that acts on the full model (the 2D cross section rotated by the above factor (2 * pi) producing the 360° model). If you leave the factor of (2 * pi) out of the integration, your results correspond to a section of 1 rad of the full model.
 
 Besides this minor addition, the following major extensions are needed in the assembly routine when mechanical problems shall be solved that use kinematics (e.g. small strain, deformation gradient).
 
