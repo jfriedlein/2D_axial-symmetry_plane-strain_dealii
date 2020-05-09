@@ -16,7 +16,7 @@ Besides this minor addition, the following major extensions are needed in the as
 
 The 2D displacement gradient computed from the displacement field (components u and w) needs to be expanded by the normal strain eps_theta. The latter is, in contrast to 2D plane strain, not zero as for instance explained by Petr Krysl in https://www.semanticscholar.org/paper/A-Pragmatic-Introduction-to-the-Finite-Element-for-Krysl/1a1e70b1dae4e971ba21af396f54b7fbaac14ffd in chapter 15.3.
 
-@todo add sketch and maybe explanation in own words
+<img src="https://github.com/jfriedlein/2D_axial-symmetry_plane-strain_dealii/blob/master/images/axialsymmetry%20-%20sketch.jpg" width="1000">
 
 To sum up, radial displacements u_r produce tangential strains eps_theta = u_r / r.
 
