@@ -6,7 +6,7 @@ Add a simple code that uses the functions in the correct order with a Doxygen do
 
 ## Remarks
 * Axisymmetry is "exact" in tangential direction. We utilise no discretisation in this "third dimension". Hence, keep in mind that when you try to compare the axisymmetric computation with a 3D model, the latter needs a fairly fine spatial discretisation in the tangential direction to converge to the axisymmetric model.
-
+* Plane strain results can be verified by 3D computations. However, it is hardly possible to make the 3D model thick enough (extension in the third dimension) to represent the plane strain state. We were able to obtain the best results by applying symmetry constraints on both z-planes, which forces the model to acquire no normal strains in the thickness direction ("plane strain").
 ## Plane strain
 <img src="https://github.com/jfriedlein/2D_axial-symmetry_plane-strain_dealii/blob/master/images/plane%20strain%20-%20sketch.jpg" width="1000">
 
