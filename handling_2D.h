@@ -225,6 +225,7 @@ const double get_JxW ( const unsigned int &type_2D, const FEValues<dim> &fe_valu
 	if ( dim==2 && enums::enum_type_2D(type_2D)==enums::axiSym )
 	{
 		const double radial_x = get_radial_x<dim>(fe_values_ref,current_QP);
+		// 2 * pi * r: pi = 4 * arctan(1 rad)
 		return (fe_values_ref.JxW(current_QP) * (2. * (4.*std::atan(1.)) * radial_x));
 	}
 	else
