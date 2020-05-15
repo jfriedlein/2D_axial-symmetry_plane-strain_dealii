@@ -91,6 +91,23 @@ SymmetricTensor<2,dim> extract_theta ( SymmetricTensor<4,3> &symTensor_3D )
 }
 
 
+/*!
+ * Return the JxW value, possibly scaled by factor 2*pi*r for axisymmetry
+ */
+template<int dim>
+const double get_JxW ( const unsigned int &type_2D, const FEValues<dim> &fe_values_ref, const unsigned int &current_QP )
+{
+	if ( dim==2 && enums::enum_type_2D(type_2D)==enums::axiSym )
+	{
+		const double radial_x = get_radial_x<dim>(fe_values_ref,current_QP);
+		// 2 * pi * r: pi = 4 * arctan(1 rad)
+		return (fe_values_ref.JxW(current_QP) * (2. * (4.*std::atan(1.)) * radial_x));
+	}
+	else
+		return fe_values_ref.JxW(current_QP);
+}
+
+
 /*
  * ################################## Small strain ###################################
  */
@@ -239,17 +256,21 @@ Tensor<2,3> prepare_DefoGrad( Tensor<2,dim> &F, const unsigned int &type_2D, con
 
 
 template<int dim>
-const double get_JxW ( const unsigned int &type_2D, const FEValues<dim> &fe_values_ref, const unsigned int &current_QP )
+SymmetricTensor<2,dim> get_Tangent_axisym_addOn_fstrain( const SymmetricTensor<2,dim> &Tangent_theta,
+														 const FEValues<dim> &fe_values_ref, const Vector<double> &current_solution,
+														 const unsigned int &current_QP, const unsigned int &j )
 {
-	if ( dim==2 && enums::enum_type_2D(type_2D)==enums::axiSym )
-	{
-		const double radial_x = get_radial_x<dim>(fe_values_ref,current_QP);
-		// 2 * pi * r: pi = 4 * arctan(1 rad)
-		return (fe_values_ref.JxW(current_QP) * (2. * (4.*std::atan(1.)) * radial_x));
-	}
-	else
-		return fe_values_ref.JxW(current_QP);
+	const double radial_u = get_radial_u<dim>(current_solution, fe_values_ref, current_QP);
+	const double radial_x = get_radial_x<dim>(fe_values_ref,current_QP);
+	// small strain:?
+	 double d_Ctheta_d_ur = 2. * ( 1. + radial_u / radial_x ) / radial_x;
+	// deformed configuration?
+	 //double dCtheta_dur = 2. * ( radial_x + 2.*radial_u ) * radial_x / std::pow(radial_u+radial_x,3);
+
+	// \f$ \frac{\partial S}{\partial C_\theta} \cdot \frac{\partial C_\theta}{\partial u_r} \cdot N_j^u \f$
+	return 0.5 * Tangent_theta * dCtheta_dur * fe_values_ref[(FEValuesExtractors::Vector) 0].value(j,current_QP)[enums::u];
 }
+
 
 
 #endif // handling_2D_h
