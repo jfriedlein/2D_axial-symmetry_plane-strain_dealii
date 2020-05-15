@@ -92,7 +92,41 @@ This strain in the third dimension must be inserted as the out-of-plane componen
 		cell_matrix(i,j) += ( sym_shape_gradient_wrt_ref_config_i * ( Tangent * sym_shape_gradient_wrt_ref_config_j + Tangent_axisym ) * JxW;
 
 ### Finite strains
+The steps are almost identical to the previous small strain scenario.
 
-repeat using the deformation gradient and the function prepare_DefoGrad
+Replace step 1 by
 
+		Tensor<2,3> DefoGradient_3D = prepare_DefoGrad<dim> (DeformationGradient, type_2D, fe_values_ref, current_solution, k);
+
+to prepare the second order 'DeformationGradient' with dim-components.
+
+Secondly, to compute the tangent contribution we also require the current solution, hence we call the function
+
+		SymmetricTensor<2,dim> Tangent_axisym = get_Tangent_axisym_addOn_fstrain( Tangent_theta, fe_values_ref, current_solution, k, j );
+
+The following assembly snippet shall give you an idea how to incorporate the tangent contribution into your stiffness matrix. The axisymmetry typically contributes to a linearisation when you derive something with respect to the deformation gradient (or the small strain tensor above). In the example below, you can imagine how the stress 'stress_S' also depends on the theta-theta component of the deformation gradient or the right Cauchy-Green tensor. Hence, this dependency needs to be captures by the tangent. So the linearisation of the stress contains besides the standard contribution also the axisymmetric addon. The latter contains in essence the derivative of the stress tensor with respect to the radial displacements "chained" as
+
+<a href="https://www.codecogs.com/eqnedit.php?latex=\frac{\partial\boldsymbol{S}}{\partial&space;u_r}&space;=&space;\frac{\partial\boldsymbol{S}}{\partial&space;C_\theta}&space;\cdot&space;\frac{\partial&space;C_\theta}{\partial&space;u_r}&space;=&space;\boldsymbol{C}_\theta&space;\cdot&space;\frac{\partial&space;C_\theta}{\partial&space;u_r}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\frac{\partial\boldsymbol{S}}{\partial&space;u_r}&space;=&space;\frac{\partial\boldsymbol{S}}{\partial&space;C_\theta}&space;\cdot&space;\frac{\partial&space;C_\theta}{\partial&space;u_r}&space;=&space;\boldsymbol{C}_\theta&space;\cdot&space;\frac{\partial&space;C_\theta}{\partial&space;u_r}" title="\frac{\partial\boldsymbol{S}}{\partial u_r} = \frac{\partial\boldsymbol{S}}{\partial C_\theta} \cdot \frac{\partial C_\theta}{\partial u_r} = \boldsymbol{C}_\theta \cdot \frac{\partial C_\theta}{\partial u_r}" /></a>
+
+! Don't interchange the scalar C_theta (theta-theta component of the 3D right Cauchy-Green tensor) with the second order tensor C_theta containing the derivatives with respect to the theta-theta strain entry.
+
+@todo add setup of 3D axisym defoGradient, where F_theta = 1 + u_r / r
+
+@todo add a note and check how things change when the derivatives are no longer wrt to the right C-G tensor
+
+		cell_matrix(i,j) += (
+					/*geometrical contribution:*/
+					symmetrize( transpose(shape_gradient_wrt_ref_config_i) * shape_gradient_wrt_ref_config_j ) * stress_S
+					+
+					/*material contribution:*/
+					(
+					   symmetrize( transpose(DeformationGradient) * shape_gradient_wrt_ref_config_i )
+					   /*linearisation of the stress tensor \a stress_S:*/
+					   * (
+						Tangent * symmetrize( transpose(shape_gradient_wrt_ref_config_j) * DeformationGradient )
+						+ get_Tangent_axisym_addOn_fstrain( Tangent_theta, fe_values_ref, current_solution, k, j )
+					     )
+					)
+				     )
+				     * JxW;
 
