@@ -103,7 +103,7 @@ The steps are almost identical to the previous small strain scenario.
 
 Replace step 1 by
 
-		Tensor<2,3> DefoGradient_3D = prepare_DefoGrad<dim> (DeformationGradient, type_2D, fe_values_ref, current_solution, k);
+	Tensor<2,3> DefoGradient_3D = prepare_DefoGrad<dim> (DeformationGradient, type_2D, fe_values_ref, current_solution, k);
 
 to prepare the second order 'DeformationGradient' with dim-components obtaining 'DefoGradient_3D'.
 
