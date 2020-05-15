@@ -11,6 +11,8 @@ Add a simple code that uses the functions in the correct order with a Doxygen do
 * Plane strain results can be verified by 3D computations. However, it is hardly possible to make the 3D model thick enough (extension in the third dimension) to represent the plane strain state. We were able to obtain the best results by applying symmetry constraints on both z-planes, which forces the model to acquire no normal strains in the thickness direction ("plane strain").
 
 ## Argument list
+@todo Input argument currently still fe_values_ref; try to use ...[u_fe]
+
 * FEValues<dim> fe_values_ref_u; // The FEValues element that corresponds to the displacement dofs, e.g. extracted via fe_values_ref[u_fe]
 * SymmetricTensor<2,dim> eps_n1; // small strain symmetric second order strain tensor
 * SymmetricTensor<4,3> Tangent_3D; // 3D fourth order tangent modulus
