@@ -67,7 +67,7 @@ This strain in the third dimension must be inserted as the out-of-plane componen
 
 @todo change fe_values_ref to ..._u, if possible
 
-		SymmetricTensor<2,3> eps_n1_3D = prepare_strain<dim> (eps_n1, type_2D, fe_values_ref, current_solution, k);
+	SymmetricTensor<2,3> eps_n1_3D = prepare_strain<dim> (eps_n1, type_2D, fe_values_ref, current_solution, k);
 
 2. Call the 3D material model with the properly prepared 3D strain tensor.
 
@@ -109,7 +109,7 @@ to prepare the second order 'DeformationGradient' with dim-components obtaining 
 
 Secondly, to compute the tangent contribution in step 6 we also require the current solution, hence we call the function
 
-		SymmetricTensor<2,dim> Tangent_axisym = get_Tangent_axisym_addOn_fstrain( Tangent_theta, fe_values_ref, current_solution, k, j );
+	SymmetricTensor<2,dim> Tangent_axisym = get_Tangent_axisym_addOn_fstrain( Tangent_theta, fe_values_ref, current_solution, k, j );
 
 The following assembly snippet shall give you an idea how to incorporate the tangent contribution into your stiffness matrix. The axisymmetry typically contributes to a linearisation when you derive something with respect to the deformation gradient (or the small strain tensor above). In the example below, you can imagine how the stress 'stress_S' also depends on the theta-theta component of the deformation gradient or the right Cauchy-Green tensor. Hence, this dependency needs to be captured by the tangent. So the linearisation of the stress contains besides the standard contribution also the axisymmetric addon. The latter contains in essence the derivative of the stress tensor with respect to the radial displacements "chained" as
 
@@ -123,19 +123,19 @@ This setup also enables us to provide the axisymmetric tangent addon for various
 
 @todo add a note and check how things change when the derivatives are no longer wrt to the right C-G tensor
 
-		cell_matrix(i,j) += (
-					/*geometrical contribution:*/
-					symmetrize( transpose(shape_gradient_wrt_ref_config_i) * shape_gradient_wrt_ref_config_j ) * stress_S
-					+
-					/*material contribution:*/
-					(
-					   symmetrize( transpose(DeformationGradient) * shape_gradient_wrt_ref_config_i )
-					   /*linearisation of the stress tensor \a stress_S:*/
-					   * (
-						Tangent * symmetrize( transpose(shape_gradient_wrt_ref_config_j) * DeformationGradient )
-						+ get_Tangent_axisym_addOn_fstrain( Tangent_theta, fe_values_ref, current_solution, k, j )
-					     )
-					)
+	cell_matrix(i,j) += (
+				/*geometrical contribution:*/
+				symmetrize( transpose(shape_gradient_wrt_ref_config_i) * shape_gradient_wrt_ref_config_j ) * stress_S
+				+
+				/*material contribution:*/
+				(
+				   symmetrize( transpose(DeformationGradient) * shape_gradient_wrt_ref_config_i )
+				   /*linearisation of the stress tensor \a stress_S:*/
+				   * (
+					Tangent * symmetrize( transpose(shape_gradient_wrt_ref_config_j) * DeformationGradient )
+					+ get_Tangent_axisym_addOn_fstrain( Tangent_theta, fe_values_ref, current_solution, k, j )
 				     )
-				     * JxW;
+				)
+			     )
+			     * JxW;
 
