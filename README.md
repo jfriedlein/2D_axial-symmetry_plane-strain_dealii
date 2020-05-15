@@ -100,15 +100,17 @@ Replace step 1 by
 
 to prepare the second order 'DeformationGradient' with dim-components.
 
-Secondly, to compute the tangent contribution we also require the current solution, hence we call the function
+Secondly, to compute the tangent contribution in step 6 we also require the current solution, hence we call the function
 
 		SymmetricTensor<2,dim> Tangent_axisym = get_Tangent_axisym_addOn_fstrain( Tangent_theta, fe_values_ref, current_solution, k, j );
 
-The following assembly snippet shall give you an idea how to incorporate the tangent contribution into your stiffness matrix. The axisymmetry typically contributes to a linearisation when you derive something with respect to the deformation gradient (or the small strain tensor above). In the example below, you can imagine how the stress 'stress_S' also depends on the theta-theta component of the deformation gradient or the right Cauchy-Green tensor. Hence, this dependency needs to be captures by the tangent. So the linearisation of the stress contains besides the standard contribution also the axisymmetric addon. The latter contains in essence the derivative of the stress tensor with respect to the radial displacements "chained" as
+The following assembly snippet shall give you an idea how to incorporate the tangent contribution into your stiffness matrix. The axisymmetry typically contributes to a linearisation when you derive something with respect to the deformation gradient (or the small strain tensor above). In the example below, you can imagine how the stress 'stress_S' also depends on the theta-theta component of the deformation gradient or the right Cauchy-Green tensor. Hence, this dependency needs to be captured by the tangent. So the linearisation of the stress contains besides the standard contribution also the axisymmetric addon. The latter contains in essence the derivative of the stress tensor with respect to the radial displacements "chained" as
 
 <a href="https://www.codecogs.com/eqnedit.php?latex=\frac{\partial\boldsymbol{S}}{\partial&space;u_r}&space;=&space;\frac{\partial\boldsymbol{S}}{\partial&space;C_\theta}&space;\cdot&space;\frac{\partial&space;C_\theta}{\partial&space;u_r}&space;=&space;\boldsymbol{C}_\theta&space;\cdot&space;\frac{\partial&space;C_\theta}{\partial&space;u_r}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\frac{\partial\boldsymbol{S}}{\partial&space;u_r}&space;=&space;\frac{\partial\boldsymbol{S}}{\partial&space;C_\theta}&space;\cdot&space;\frac{\partial&space;C_\theta}{\partial&space;u_r}&space;=&space;\boldsymbol{C}_\theta&space;\cdot&space;\frac{\partial&space;C_\theta}{\partial&space;u_r}" title="\frac{\partial\boldsymbol{S}}{\partial u_r} = \frac{\partial\boldsymbol{S}}{\partial C_\theta} \cdot \frac{\partial C_\theta}{\partial u_r} = \boldsymbol{C}_\theta \cdot \frac{\partial C_\theta}{\partial u_r}" /></a>
 
 ! Don't interchange the scalar C_theta (theta-theta component of the 3D right Cauchy-Green tensor) with the second order tensor C_theta containing the derivatives with respect to the theta-theta strain entry.
+
+This setup also enables us to provide the axisymmetric tangent addon for various linearisation by simply calling the 'get_Tangent_axisym_addOn_fstrain' function with the respective tangent contribution C_theta.
 
 @todo add setup of 3D axisym defoGradient, where F_theta = 1 + u_r / r
 
