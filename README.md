@@ -119,7 +119,7 @@ The following assembly snippet shall give you an idea how to incorporate the tan
 
 This setup also enables us to provide the axisymmetric tangent addon for various linearisation by simply calling the 'get_Tangent_axisym_addOn_fstrain' function with the respective tangent contribution C_theta.
 
-@todo add setup of 3D axisym defoGradient, where F_theta = 1 + u_r / r
+@todo add scan of sketched summary with setup of 3D axisym defoGradient, where F_theta = 1 + u_r / r
 
 @todo add a note and check how things change when the derivatives are no longer wrt to the right C-G tensor
 
