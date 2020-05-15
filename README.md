@@ -89,7 +89,14 @@ This strain in the third dimension must be inserted as the out-of-plane componen
 6. In the loop over the dofs 'j' (to assemble the cell_matrix(i,j)) compute the theta contribution 'Tangent_axisym' and add it to the linearisation of the stress tensor (typically 'Tangent * sym_shape_gradient_wrt_ref_config_j')
 
 		SymmetricTensor<2,dim> Tangent_axisym = get_Tangent_axisym_addOn(Tangent_theta, fe_values_ref[u_fe],k,j);
-		cell_matrix(i,j) += ( sym_shape_gradient_wrt_ref_config_i * ( Tangent * sym_shape_gradient_wrt_ref_config_j + Tangent_axisym ) * JxW;
+		cell_matrix(i,j) += (
+					sym_shape_gradient_wrt_ref_config_i
+					/*linearisation of the stress tensor:*/
+					* (
+						Tangent * sym_shape_gradient_wrt_ref_config_j
+						+ Tangent_axisym
+					   )
+				     ) * JxW;
 
 ### Finite strains
 The steps are almost identical to the previous small strain scenario.
@@ -98,7 +105,7 @@ Replace step 1 by
 
 		Tensor<2,3> DefoGradient_3D = prepare_DefoGrad<dim> (DeformationGradient, type_2D, fe_values_ref, current_solution, k);
 
-to prepare the second order 'DeformationGradient' with dim-components.
+to prepare the second order 'DeformationGradient' with dim-components obtaining 'DefoGradient_3D'.
 
 Secondly, to compute the tangent contribution in step 6 we also require the current solution, hence we call the function
 
