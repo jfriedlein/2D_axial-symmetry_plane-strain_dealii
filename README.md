@@ -2,7 +2,8 @@
 Proposal of a framework and functions to handle 2D computations such as axial symmetry or plane strain in deal.ii
 
 ## ToDo
-Add a simple code that uses the functions in the correct order with a Doxygen documentation. E.g. expand on step-3 using the Rod ([Numerical examples in deal.ii](https://github.com/jfriedlein/Numerical_examples_in_dealii)) in 2D and 3D.
+* Add a simple code that uses the functions in the correct order with a Doxygen documentation. E.g. expand on step-3 using the Rod ([Numerical examples in deal.ii](https://github.com/jfriedlein/Numerical_examples_in_dealii)) in 2D and 3D.
+* Try using the class DataOutRotation (https://dealii.org/developer/doxygen/deal.II/classDataOutRotation.html) that can rotate the 2D results around the z-axis to output 3D results.
 
 ## Remarks
 * The code outlined below is also compatible to 3D, so you don't have to differentiate between 2D and 3D. It does no harm to your 3D computation.
