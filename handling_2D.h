@@ -91,6 +91,26 @@ SymmetricTensor<2,dim> extract_theta ( SymmetricTensor<4,3> &symTensor_3D )
 }
 
 
+template <int dim>
+const double get_radial_x( const FEValues<dim> &fe_values_ref, const unsigned int &current_QP )
+{
+	return (fe_values_ref.quadrature_point(current_QP)[enums::r]);
+}
+
+
+// ToDo: avoid using the FEextractor maybe use fe_values[u_fe] as input
+template <int dim>
+const double get_radial_u( const Vector<double> &current_solution, const FEValues<dim> &fe_values_ref,
+						   const unsigned int &current_QP )
+{
+	// ToDo-optimize: Here we evaluate all QPs of the cell but just require the data at the current QP
+	 std::vector< Tensor<1,dim> > cell_solution(fe_values_ref.get_quadrature().size());
+	 // ToDo: use instead of extractor 0 the same value as for \a u_fe in MA-Code.cc
+	 fe_values_ref[(FEValuesExtractors::Vector) 0].get_function_values(current_solution, cell_solution);
+	 return cell_solution[current_QP][enums::u];
+}
+
+
 /*!
  * Return the JxW value, possibly scaled by factor 2*pi*r for axisymmetry
  */
@@ -123,25 +143,6 @@ SymmetricTensor<2,3> prepare_planeStrain( SymmetricTensor<2,dim> &strain )
 	return expand_3D<dim> (strain);
 }
 
-
-template <int dim>
-const double get_radial_x( const FEValues<dim> &fe_values_ref, const unsigned int &current_QP )
-{
-	return (fe_values_ref.quadrature_point(current_QP)[enums::r]);
-}
-
-
-// ToDo: avoid using the FEextractor maybe use fe_values[u_fe] as input
-template <int dim>
-const double get_radial_u( const Vector<double> &current_solution, const FEValues<dim> &fe_values_ref,
-						   const unsigned int &current_QP )
-{
-	// ToDo-optimize: Here we evaluate all QPs of the cell but just require the data at the current QP
-	 std::vector< Tensor<1,dim> > cell_solution(fe_values_ref.get_quadrature().size());
-	 // ToDo: use instead of extractor 0 the same value as for \a u_fe in MA-Code.cc
-	 fe_values_ref[(FEValuesExtractors::Vector) 0].get_function_values(current_solution, cell_solution);
-	 return cell_solution[current_QP][enums::u];
-}
 
 /*!
  * Prepare the 2D strain tensor for an axial symmetric computation by incorporating
@@ -268,7 +269,7 @@ SymmetricTensor<2,dim> get_Tangent_axisym_addOn_fstrain( const SymmetricTensor<2
 	 //double dCtheta_dur = 2. * ( radial_x + 2.*radial_u ) * radial_x / std::pow(radial_u+radial_x,3);
 
 	// \f$ \frac{\partial S}{\partial C_\theta} \cdot \frac{\partial C_\theta}{\partial u_r} \cdot N_j^u \f$
-	return 0.5 * Tangent_theta * dCtheta_dur * fe_values_ref[(FEValuesExtractors::Vector) 0].value(j,current_QP)[enums::u];
+	return 0.5 * Tangent_theta * d_Ctheta_d_ur * fe_values_ref[(FEValuesExtractors::Vector) 0].value(j,current_QP)[enums::u];
 }
 
 
