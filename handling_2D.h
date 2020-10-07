@@ -92,7 +92,7 @@ SymmetricTensor<2,dim> extract_theta ( SymmetricTensor<4,3> &symTensor_3D )
 
 
 template <int dim>
-const double get_radial_x( const FEValues<dim> &fe_values_ref, const unsigned int &current_QP )
+double get_radial_x( const FEValues<dim> &fe_values_ref, const unsigned int &current_QP )
 {
 	return (fe_values_ref.quadrature_point(current_QP)[enums::r]);
 }
@@ -100,7 +100,7 @@ const double get_radial_x( const FEValues<dim> &fe_values_ref, const unsigned in
 
 // ToDo: avoid using the FEextractor maybe use fe_values[u_fe] as input
 template <int dim>
-const double get_radial_u( const Vector<double> &current_solution, const FEValues<dim> &fe_values_ref,
+double get_radial_u( const Vector<double> &current_solution, const FEValues<dim> &fe_values_ref,
 						   const unsigned int &current_QP )
 {
 	// ToDo-optimize: Here we evaluate all QPs of the cell but just require the data at the current QP
@@ -115,7 +115,7 @@ const double get_radial_u( const Vector<double> &current_solution, const FEValue
  * Return the JxW value, possibly scaled by factor 2*pi*r for axisymmetry
  */
 template<int dim>
-const double get_JxW ( const unsigned int &type_2D, const FEValues<dim> &fe_values_ref, const unsigned int &current_QP )
+double get_JxW ( const unsigned int &type_2D, const FEValues<dim> &fe_values_ref, const unsigned int &current_QP )
 {
 	if ( dim==2 && enums::enum_type_2D(type_2D)==enums::axiSym )
 	{
@@ -181,6 +181,9 @@ SymmetricTensor<2,3> prepare_strain ( SymmetricTensor<2,dim> &strain, const unsi
 			case enums::axiSym:
 				return prepare_axiSym<dim> (strain, fe_values_ref, current_solution, current_QP);
 			break;
+			default:
+				AssertThrow(false,ExcMessage("sd"));
+				break;
 		}
 }
 
@@ -252,6 +255,9 @@ Tensor<2,3> prepare_DefoGrad( Tensor<2,dim> &F, const unsigned int &type_2D, con
 			case enums::axiSym:
 				return prepare_axiSym<dim> (F, fe_values_ref, current_solution, current_QP);
 			break;
+			default:
+				AssertThrow(false,ExcMessage("sd"));
+				break;
 		}
 }
 
