@@ -15,18 +15,23 @@
 /*!
  * Extract the dim components from a full 3D tensor
  */
+/**
+ * @todo-optimize Find a  more efficient way to avoid the transformation for 3D
+ * @param symTensor_3D
+ * @return
+ */
 template<int dim>
-SymmetricTensor<2,dim> extract_dim ( SymmetricTensor<2,3> &symTensor_3D )
+SymmetricTensor<2,dim> extract_dim ( const SymmetricTensor<2,3> &symTensor_3D )
 {
-    SymmetricTensor<2,dim> symTensor_dim;
-    for ( unsigned int i=0; i<dim; i++)
-        for ( unsigned int j=i; j<dim; j++)
-            symTensor_dim[i][j] = symTensor_3D[i][j];
+	SymmetricTensor<2,dim> symTensor_dim;
+	for ( unsigned int i=0; i<dim; i++)
+		for ( unsigned int j=i; j<dim; j++)
+			symTensor_dim[i][j] = symTensor_3D[i][j];
 
-    return symTensor_dim;
+	return symTensor_dim;
 }
 template<int dim>
-SymmetricTensor<4,dim> extract_dim ( SymmetricTensor<4,3> &symTensor_3D )
+SymmetricTensor<4,dim> extract_dim ( const SymmetricTensor<4,3> &symTensor_3D )
 {
 	SymmetricTensor<4,dim> symTensor_dim;
 	for ( unsigned int i=0; i<dim; ++i )
@@ -35,7 +40,7 @@ SymmetricTensor<4,dim> extract_dim ( SymmetricTensor<4,3> &symTensor_3D )
 				for ( unsigned int l=k; l<dim; ++l )
 				  symTensor_dim[i][j][k][l] = symTensor_3D[i][j][k][l];
 
-    return symTensor_dim;
+	return symTensor_dim;
 }
 
 
@@ -80,7 +85,7 @@ SymmetricTensor<4,3> expand_3D ( SymmetricTensor<4,dim> &symTensor_dim )
  * Extract the tangent contribution that belongs to the theta-strain
  */
 template<int dim>
-SymmetricTensor<2,dim> extract_theta ( SymmetricTensor<4,3> &symTensor_3D )
+SymmetricTensor<2,dim> extract_theta ( const SymmetricTensor<4,3> &symTensor_3D )
 {
 	SymmetricTensor<2,dim> symTensor_theta;
 	for ( unsigned int i=0; i<dim; ++i )
