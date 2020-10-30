@@ -58,7 +58,7 @@ SymmetricTensor<4,dim> extract_dim ( const SymmetricTensor<4,3> &symTensor_3D )
  * Expand a dim component tensor to a full 3D tensor
  */
 template<int dim>
-SymmetricTensor<2,3> expand_3D ( SymmetricTensor<2,dim> &symTensor_dim )
+SymmetricTensor<2,3> expand_3D ( const SymmetricTensor<2,dim> &symTensor_dim )
 {
     SymmetricTensor<2,3> symTensor_3D;
     for ( unsigned int i=0; i<dim; i++)
@@ -68,7 +68,7 @@ SymmetricTensor<2,3> expand_3D ( SymmetricTensor<2,dim> &symTensor_dim )
     return symTensor_3D;
 }
 template<int dim>
-Tensor<2,3> expand_3D ( Tensor<2,dim> &tensor_dim )
+Tensor<2,3> expand_3D ( const Tensor<2,dim> &tensor_dim )
 {
 	Tensor<2,3> tensor_3D;
     for ( unsigned int i=0; i<dim; i++)
@@ -78,7 +78,7 @@ Tensor<2,3> expand_3D ( Tensor<2,dim> &tensor_dim )
     return tensor_3D;
 }
 template<int dim>
-SymmetricTensor<4,3> expand_3D ( SymmetricTensor<4,dim> &symTensor_dim )
+SymmetricTensor<4,3> expand_3D ( const SymmetricTensor<4,dim> &symTensor_dim )
 {
 	SymmetricTensor<4,dim> symTensor_3D;
 	for ( unsigned int i=0; i<dim; ++i )
@@ -116,7 +116,7 @@ double get_radial_x( const FEValues<dim> &fe_values_ref, const unsigned int &cur
 // ToDo: avoid using the FEextractor maybe use fe_values[u_fe] as input
 template <int dim>
 double get_radial_u( const Vector<double> &current_solution, const FEValues<dim> &fe_values_ref,
-						   const unsigned int &current_QP )
+					 const unsigned int &current_QP )
 {
 	// ToDo-optimize: Here we evaluate all QPs of the cell but just require the data at the current QP
 	 std::vector< Tensor<1,dim> > cell_solution(fe_values_ref.get_quadrature().size());
@@ -153,7 +153,7 @@ double get_JxW ( const unsigned int &type_2D, const FEValues<dim> &fe_values_ref
  * by the out-of plane strains being zero
  */
 template <int dim>
-SymmetricTensor<2,3> prepare_planeStrain( SymmetricTensor<2,dim> &strain )
+SymmetricTensor<2,3> prepare_planeStrain( const SymmetricTensor<2,dim> &strain )
 {
 	return expand_3D<dim> (strain);
 }
@@ -164,7 +164,7 @@ SymmetricTensor<2,3> prepare_planeStrain( SymmetricTensor<2,dim> &strain )
  * the dependency of the ouf-of plane normal strain on the radial displacement
  */
 template <int dim>
-SymmetricTensor<2,3> prepare_axiSym( SymmetricTensor<2,dim> &strain, const FEValues<dim> &fe_values_ref,
+SymmetricTensor<2,3> prepare_axiSym( const SymmetricTensor<2,dim> &strain, const FEValues<dim> &fe_values_ref,
 									 const Vector<double> &current_solution, const unsigned int &current_QP )
 {
 	// Get the radial coordinate of the current QP and extract its radial displacement
@@ -181,7 +181,7 @@ SymmetricTensor<2,3> prepare_axiSym( SymmetricTensor<2,dim> &strain, const FEVal
 
 // Handling 2D plane strain and axial symmetry
 template <int dim>
-SymmetricTensor<2,3> prepare_strain ( SymmetricTensor<2,dim> &strain, const unsigned int &type_2D,
+SymmetricTensor<2,3> prepare_strain ( const SymmetricTensor<2,dim> &strain, const unsigned int &type_2D,
 									  const FEValues<dim> &fe_values_ref, const Vector<double> &current_solution,
 									  const unsigned int &current_QP )
 {
@@ -206,8 +206,8 @@ SymmetricTensor<2,3> prepare_strain ( SymmetricTensor<2,dim> &strain, const unsi
 // ToDo: check whether we can declare the enumerator for the 2D type (plane strain, axisym) in here in the same namespace enums::
 template<int dim>
 SymmetricTensor<2,dim> get_dS_theta_axisym_sstrain( const SymmetricTensor<2,dim> &Tangent_theta,
-		  	  	  	  	  	  	  	  	  	  	 const FEValues<dim> &fe_values_ref,
-												 const unsigned int &current_QP, const unsigned int &j )
+													 const FEValues<dim> &fe_values_ref,
+													 const unsigned int &current_QP, const unsigned int &j )
 {
 	// \f$ \frac{\partial \sigma}{\partial \varepsilon_\theta} / r \cdot N_j^u \f$
 	return Tangent_theta / get_radial_x<dim>(fe_values_ref,current_QP)
@@ -242,7 +242,7 @@ SymmetricTensor<2,dim> get_dS_theta_axisym_fstrain( const SymmetricTensor<2,dim>
  * by the out-of plane strains being zero
  */
 template <int dim>
-Tensor<2,3> prepare_planeStrain( Tensor<2,dim> &F )
+Tensor<2,3> prepare_planeStrain( const Tensor<2,dim> &F )
 {
 	Tensor<2,3> F_3D = expand_3D<dim>(F);
 	F_3D[enums::z][enums::z] = 1.;
@@ -255,7 +255,7 @@ Tensor<2,3> prepare_planeStrain( Tensor<2,dim> &F )
  * the dependency of the ouf-of plane normal strain on the radial displacement
  */
 template <int dim>
-Tensor<2,3> prepare_axiSym( Tensor<2,dim> &F, const FEValues<dim> &fe_values_ref, const Vector<double> &current_solution,
+Tensor<2,3> prepare_axiSym( const Tensor<2,dim> &F, const FEValues<dim> &fe_values_ref, const Vector<double> &current_solution,
 							const unsigned int &current_QP )
 {
 	// Get the radial coordinate of the current QP and extract its radial displacement
@@ -275,7 +275,7 @@ Tensor<2,3> prepare_axiSym( Tensor<2,dim> &F, const FEValues<dim> &fe_values_ref
 
 // Handling 2D plane strain and axial symmetry
 template <int dim>
-Tensor<2,3> prepare_DefoGrad( Tensor<2,dim> &F, const unsigned int &type_2D, const FEValues<dim> &fe_values_ref,
+Tensor<2,3> prepare_DefoGrad( const Tensor<2,dim> &F, const unsigned int &type_2D, const FEValues<dim> &fe_values_ref,
 							  const Vector<double> &current_solution, const unsigned int &current_QP )
 {
 	if ( dim==3 )
