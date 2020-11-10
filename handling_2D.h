@@ -216,6 +216,15 @@ SymmetricTensor<2,dim> get_dS_theta_axisym_sstrain( const SymmetricTensor<2,dim>
 
 
 // ToDo: check whether we can declare the enumerator for the 2D type (plane strain, axisym) in here in the same namespace enums::
+/**
+ * @note Here we desire the pure dS_dC derivative part not "2*" in Tangent_theta.
+ * @param Tangent_theta
+ * @param fe_values_ref
+ * @param current_solution
+ * @param current_QP
+ * @param j
+ * @return
+ */
 template<int dim>
 SymmetricTensor<2,dim> get_dS_theta_axisym_fstrain( const SymmetricTensor<2,dim> &Tangent_theta,
 		  	  	  	  	  	  	  	  	  	  	 	const FEValues<dim> &fe_values_ref, const Vector<double> &current_solution,
@@ -228,7 +237,7 @@ SymmetricTensor<2,dim> get_dS_theta_axisym_fstrain( const SymmetricTensor<2,dim>
 	// deformed configuration?
 	//double dCtheta_dur = 2. * ( radial_x + 2.*radial_u ) * radial_x / std::pow(radial_u+radial_x,3);
 	double dCtheta_dur = 2. * ( 1. + radial_u / radial_x ) / radial_x;
-	return 0.5 * Tangent_theta * dCtheta_dur * shape_fnc_j_u;
+	return Tangent_theta * dCtheta_dur * shape_fnc_j_u;
 }
 
 
