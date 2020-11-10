@@ -233,10 +233,11 @@ SymmetricTensor<2,dim> get_dS_theta_axisym_fstrain( const SymmetricTensor<2,dim>
 	double shape_fnc_j_u = fe_values_ref[(FEValuesExtractors::Vector) 0].value(j,current_QP)[enums::u];
 	const double radial_u = get_radial_u<dim>(current_solution, fe_values_ref, current_QP);
 	const double radial_x = get_radial_x<dim>(fe_values_ref,current_QP);
-	// small strain:?
-	// deformed configuration?
-	//double dCtheta_dur = 2. * ( radial_x + 2.*radial_u ) * radial_x / std::pow(radial_u+radial_x,3);
+
 	double dCtheta_dur = 2. * ( 1. + radial_u / radial_x ) / radial_x;
+	// deformed configuration?
+//	double dCtheta_dur = 2. * ( radial_x + 2.*radial_u ) * radial_x / std::pow(radial_u+radial_x,3);
+
 	return Tangent_theta * dCtheta_dur * shape_fnc_j_u;
 }
 
@@ -268,7 +269,7 @@ Tensor<2,3> prepare_axiSym( const Tensor<2,dim> &F, const FEValues<dim> &fe_valu
 							const unsigned int &current_QP )
 {
 	// Get the radial coordinate of the current QP and extract its radial displacement
-	 const double radial_x = get_radial_x<dim>(fe_values_ref,current_QP);
+	 const double radial_x = get_radial_x<dim>(fe_values_ref,current_QP); // this deliveres undeformed values
 	 const double radial_u = get_radial_u<dim>(current_solution, fe_values_ref, current_QP);
 
 	// Enter the out-of plane normal strain into the 3D strain tensor
@@ -276,7 +277,7 @@ Tensor<2,3> prepare_axiSym( const Tensor<2,dim> &F, const FEValues<dim> &fe_valu
 	 // small strain?
 	 F_3D[enums::theta][enums::theta] = 1. + radial_u/radial_x;
 	 // deformed configuration?
-	 //F_3D[enums::theta][enums::theta] = 1. + radial_u/(radial_x+radial_u);
+//	 F_3D[enums::theta][enums::theta] = 1. + radial_u/(radial_x+radial_u);
 
 	return F_3D;
 }
@@ -305,21 +306,21 @@ Tensor<2,3> prepare_DefoGrad( const Tensor<2,dim> &F, const unsigned int &type_2
 }
 
 
-template<int dim>
-SymmetricTensor<2,dim> get_Tangent_axisym_addOn_fstrain( const SymmetricTensor<2,dim> &Tangent_theta,
-														 const FEValues<dim> &fe_values_ref, const Vector<double> &current_solution,
-														 const unsigned int &current_QP, const unsigned int &j )
-{
-	const double radial_u = get_radial_u<dim>(current_solution, fe_values_ref, current_QP);
-	const double radial_x = get_radial_x<dim>(fe_values_ref,current_QP);
-	// small strain:?
-	 double d_Ctheta_d_ur = 2. * ( 1. + radial_u / radial_x ) / radial_x;
-	// deformed configuration?
-	 //double dCtheta_dur = 2. * ( radial_x + 2.*radial_u ) * radial_x / std::pow(radial_u+radial_x,3);
-
-	// \f$ \frac{\partial S}{\partial C_\theta} \cdot \frac{\partial C_\theta}{\partial u_r} \cdot N_j^u \f$
-	return 0.5 * Tangent_theta * d_Ctheta_d_ur * fe_values_ref[(FEValuesExtractors::Vector) 0].value(j,current_QP)[enums::u];
-}
+//template<int dim>
+//SymmetricTensor<2,dim> get_Tangent_axisym_addOn_fstrain( const SymmetricTensor<2,dim> &Tangent_theta,
+//														 const FEValues<dim> &fe_values_ref, const Vector<double> &current_solution,
+//														 const unsigned int &current_QP, const unsigned int &j )
+//{
+//	const double radial_u = get_radial_u<dim>(current_solution, fe_values_ref, current_QP);
+//	const double radial_x = get_radial_x<dim>(fe_values_ref,current_QP);
+//	// small strain:?
+//	 double d_Ctheta_d_ur = 2. * ( 1. + radial_u / radial_x ) / radial_x;
+//	// deformed configuration?
+////	 double d_Ctheta_d_ur = 2. * ( radial_x + 2.*radial_u ) * radial_x / std::pow(radial_u+radial_x,3);
+//
+//	// \f$ \frac{\partial S}{\partial C_\theta} \cdot \frac{\partial C_\theta}{\partial u_r} \cdot N_j^u \f$
+//	return 0.5 * Tangent_theta * d_Ctheta_d_ur * fe_values_ref[(FEValuesExtractors::Vector) 0].value(j,current_QP)[enums::u];
+//}
 
 
 
