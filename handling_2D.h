@@ -89,6 +89,15 @@ SymmetricTensor<4,3> expand_3D ( const SymmetricTensor<4,dim> &symTensor_dim )
 
     return symTensor_3D;
 }
+template<int dim>
+Tensor<1,3> expand_3D ( const Tensor<1,dim> &tensor_dim )
+{
+	Tensor<1,3> tensor_3D;
+    for ( unsigned int i=0; i<dim; i++)
+        	tensor_3D[i] = tensor_dim[i];
+
+    return tensor_3D;
+}
 
 
 /*!
