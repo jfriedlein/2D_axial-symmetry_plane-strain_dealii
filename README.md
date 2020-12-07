@@ -6,8 +6,10 @@ Proposal of a framework and functions to handle 2D computations such as axial sy
 * Add a simple code that uses the functions in the correct order with a Doxygen documentation. E.g. expand on step-3 using the Rod ([Numerical examples in deal.ii](https://github.com/jfriedlein/Numerical_examples_in_dealii)) in 2D and 3D.
 * Try using the class DataOutRotation (https://dealii.org/developer/doxygen/deal.II/classDataOutRotation.html) that can rotate the 2D results around the z-axis to output 3D results.
 * Implementation: The functions get_JxW etc. require the FEValues Updateflag "update_quadrature_points"
+* Option to choose the rotation axis (x,y,angle to x, ...)
 
 ## Remarks
+* The axisymmetric formulation uses the y-axis as rotational axis, so the radius extents along the x-axis.
 * The code outlined below is also compatible to 3D, so you don't have to differentiate between 2D and 3D. It does no harm to your 3D computation.
 * Obviously the code design is far from optimal. We recompute the same values multiple times and even slightly slow down a standard 3D computaton for which none of the below steps are necessary. The focus is currently on usability and comprehensibility.
 * Axisymmetry is "exact" in tangential direction. We utilise no discretisation in this "third dimension". Hence, keep in mind that when you try to compare the axisymmetric computation with a 3D model, the latter needs a fairly fine spatial discretisation in the tangential direction to converge to the axisymmetric model.

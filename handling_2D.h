@@ -5,12 +5,33 @@
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/lac/vector.h>
 
-#include "../MA-Code/enumerator_list.h"
-
 // @todo Check whether the following three headers are needed at all
 #include <iostream>
 #include <fstream>
 #include <cmath>
+
+namespace enums
+{
+     enum enum_coord_ax
+	 {
+		r = 0,
+		theta = 2,
+		u = 0,
+		w = 1
+	 };
+
+     /**
+      * 2D model types:
+      * - plane strain: uses the 3D material models but sets all out-of-plane strains to zero for the input
+      * - axisymmetric: for axial symmetry, which requires a special out-of-plane strain or deformation gradient component
+      * (see <a href="https://github.com/jfriedlein/2D_axial-symmetry_plane-strain_dealii">2D axial symmetry and plane strain</a>)
+      */
+      enum enum_type_2D
+ 	 {
+ 		 planeStrain = 0,//!< planeStrain
+ 		 axiSym = 1      //!< axiSym
+ 	 };
+}
 
 /*!
  * Extract the dim components from a full 3D tensor
@@ -212,7 +233,6 @@ SymmetricTensor<2,3> prepare_strain ( const SymmetricTensor<2,dim> &strain, cons
 }
 
 
-// ToDo: check whether we can declare the enumerator for the 2D type (plane strain, axisym) in here in the same namespace enums::
 template<int dim>
 SymmetricTensor<2,dim> get_dS_theta_axisym_sstrain( const SymmetricTensor<2,dim> &Tangent_theta,
 													 const FEValues<dim> &fe_values_ref,
@@ -224,7 +244,6 @@ SymmetricTensor<2,dim> get_dS_theta_axisym_sstrain( const SymmetricTensor<2,dim>
 }
 
 
-// ToDo: check whether we can declare the enumerator for the 2D type (plane strain, axisym) in here in the same namespace enums::
 /**
  * @note Here we desire the pure dS_dC derivative part not "2*" in Tangent_theta.
  * @param Tangent_theta
@@ -264,7 +283,7 @@ template <int dim>
 Tensor<2,3> prepare_planeStrain( const Tensor<2,dim> &F )
 {
 	Tensor<2,3> F_3D = expand_3D<dim>(F);
-	F_3D[enums::z][enums::z] = 1.;
+	F_3D[enums::theta][enums::theta] = 1.;
 	return F_3D;
 }
 
