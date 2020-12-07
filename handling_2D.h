@@ -216,7 +216,7 @@ SymmetricTensor<2,3> prepare_strain ( const SymmetricTensor<2,dim> &strain, cons
 template<int dim>
 SymmetricTensor<2,dim> get_dS_theta_axisym_sstrain( const SymmetricTensor<2,dim> &Tangent_theta,
 													 const FEValues<dim> &fe_values_ref,
-													 const unsigned int &current_QP, const unsigned int &j )
+													 const unsigned int current_QP, const unsigned int j )
 {
 	// \f$ \frac{\partial \sigma}{\partial \varepsilon_\theta} / r \cdot N_j^u \f$
 	return Tangent_theta / get_radial_x<dim>(fe_values_ref,current_QP)
@@ -237,7 +237,7 @@ SymmetricTensor<2,dim> get_dS_theta_axisym_sstrain( const SymmetricTensor<2,dim>
 template<int dim>
 SymmetricTensor<2,dim> get_dS_theta_axisym_fstrain( const SymmetricTensor<2,dim> &Tangent_theta,
 		  	  	  	  	  	  	  	  	  	  	 	const FEValues<dim> &fe_values_ref, const Vector<double> &current_solution,
-												 	unsigned int &current_QP, const unsigned int &j )
+												 	const unsigned int current_QP, const unsigned int j )
 {
 	double shape_fnc_j_u = fe_values_ref[(FEValuesExtractors::Vector) 0].value(j,current_QP)[enums::u];
 	const double radial_u = get_radial_u<dim>(current_solution, fe_values_ref, current_QP);
@@ -283,10 +283,7 @@ Tensor<2,3> prepare_axiSym( const Tensor<2,dim> &F, const FEValues<dim> &fe_valu
 
 	// Enter the out-of plane normal strain into the 3D strain tensor
 	 Tensor<2,3> F_3D = expand_3D<dim>(F);
-	 // small strain?
 	 F_3D[enums::theta][enums::theta] = 1. + radial_u/radial_x;
-	 // deformed configuration?
-//	 F_3D[enums::theta][enums::theta] = 1. + radial_u/(radial_x+radial_u);
 
 	return F_3D;
 }
