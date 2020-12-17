@@ -200,7 +200,7 @@ SymmetricTensor<2,3> prepare_axiSym( const SymmetricTensor<2,dim> &strain, const
 	// Get the radial coordinate of the current QP and extract its radial displacement
 	 const double radial_x = get_radial_x<dim>(fe_values_ref,current_QP);
 	 const double radial_u = get_radial_u<dim>(current_solution, fe_values_ref, current_QP);
-	 
+
 	// Enter the out-of plane normal strain into the 3D strain tensor
 	 SymmetricTensor<2,3> strain_3D = expand_3D<dim>(strain);
 	 strain_3D[enums::theta][enums::theta] = radial_u/radial_x;
@@ -216,7 +216,7 @@ SymmetricTensor<2,3> prepare_strain ( const SymmetricTensor<2,dim> &strain, cons
 									  const unsigned int &current_QP )
 {
 	if ( dim==3 )
-		return expand_3D<dim> (strain); // does nothing for 3D
+		return expand_3D<dim> (strain); // does nothing for 3D @todo try SymTensor<2,3>(strain)
 	else
 		switch ( enums::enum_type_2D(type_2D) )
 		{
@@ -241,32 +241,6 @@ SymmetricTensor<2,dim> get_dS_theta_axisym_sstrain( const SymmetricTensor<2,dim>
 	// \f$ \frac{\partial \sigma}{\partial \varepsilon_\theta} / r \cdot N_j^u \f$
 	return Tangent_theta / get_radial_x<dim>(fe_values_ref,current_QP)
 			* fe_values_ref[(FEValuesExtractors::Vector) 0].value(j,current_QP)[enums::u];
-}
-
-
-/**
- * @note Here we desire the pure dS_dC derivative part not "2*" in Tangent_theta.
- * @param Tangent_theta
- * @param fe_values_ref
- * @param current_solution
- * @param current_QP
- * @param j
- * @return
- */
-template<int dim>
-SymmetricTensor<2,dim> get_dS_theta_axisym_fstrain( const SymmetricTensor<2,dim> &Tangent_theta,
-		  	  	  	  	  	  	  	  	  	  	 	const FEValues<dim> &fe_values_ref, const Vector<double> &current_solution,
-												 	const unsigned int current_QP, const unsigned int j )
-{
-	double shape_fnc_j_u = fe_values_ref[(FEValuesExtractors::Vector) 0].value(j,current_QP)[enums::u];
-	const double radial_u = get_radial_u<dim>(current_solution, fe_values_ref, current_QP);
-	const double radial_x = get_radial_x<dim>(fe_values_ref,current_QP);
-
-	double dCtheta_dur = 2. * ( 1. + radial_u / radial_x ) / radial_x;
-	// deformed configuration?
-//	double dCtheta_dur = 2. * ( radial_x + 2.*radial_u ) * radial_x / std::pow(radial_u+radial_x,3);
-
-	return Tangent_theta * dCtheta_dur * shape_fnc_j_u;
 }
 
 
@@ -328,6 +302,32 @@ Tensor<2,3> prepare_DefoGrad( const Tensor<2,dim> &F, const unsigned int &type_2
 				AssertThrow(false,ExcMessage("sd"));
 				break;
 		}
+}
+
+
+/**
+ * @note Here we desire the pure dS_dC derivative part not "2*" in Tangent_theta.
+ * @param Tangent_theta
+ * @param fe_values_ref
+ * @param current_solution
+ * @param current_QP
+ * @param j
+ * @return
+ */
+template<int dim>
+SymmetricTensor<2,dim> get_dS_theta_axisym_fstrain( const SymmetricTensor<2,dim> &Tangent_theta,
+		  	  	  	  	  	  	  	  	  	  	 	const FEValues<dim> &fe_values_ref, const Vector<double> &current_solution,
+												 	const unsigned int current_QP, const unsigned int j )
+{
+	double shape_fnc_j_u = fe_values_ref[(FEValuesExtractors::Vector) 0].value(j,current_QP)[enums::u];
+	const double radial_u = get_radial_u<dim>(current_solution, fe_values_ref, current_QP);
+	const double radial_x = get_radial_x<dim>(fe_values_ref,current_QP);
+
+	double dCtheta_dur = 2. * ( 1. + radial_u / radial_x ) / radial_x;
+	// deformed configuration?
+//	double dCtheta_dur = 2. * ( radial_x + 2.*radial_u ) * radial_x / std::pow(radial_u+radial_x,3);
+
+	return Tangent_theta * dCtheta_dur * shape_fnc_j_u;
 }
 
 
