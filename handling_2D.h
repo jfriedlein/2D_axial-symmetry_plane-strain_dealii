@@ -73,7 +73,18 @@ SymmetricTensor<4,dim> extract_dim ( const SymmetricTensor<4,3> &symTensor_3D )
 
 	return symTensor_dim;
 }
+template<int dim>
+Tensor<4,dim> extract_dim ( const Tensor<4,3> &tensor_3D )
+{
+	Tensor<4,dim> tensor_dim;
+	for ( unsigned int i=0; i<dim; ++i )
+		for ( unsigned int j=0; j<dim; ++j )
+			for ( unsigned int k=0; k<dim; ++k )
+				for ( unsigned int l=0; l<dim; ++l )
+					tensor_dim[i][j][k][l] = tensor_3D[i][j][k][l];
 
+	return tensor_dim;
+}
 
 /*!
  * Expand a dim component tensor to a full 3D tensor
@@ -143,7 +154,7 @@ double get_radial_x( const FEValues<dim> &fe_values_ref, const unsigned int &cur
 }
 
 
-// ToDo: avoid using the FEextractor maybe use fe_values[u_fe] as input
+// @ToDo: avoid using the FEextractor maybe use fe_values[u_fe] as input
 template <int dim>
 double get_radial_u( const Vector<double> &current_solution, const FEValues<dim> &fe_values_ref,
 					 const unsigned int &current_QP )
