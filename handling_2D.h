@@ -288,6 +288,9 @@ Tensor<2,3> prepare_axiSym( const Tensor<2,dim> &F, const FEValues<dim> &fe_valu
 	// Enter the out-of plane normal strain into the 3D strain tensor
 	 Tensor<2,3> F_3D = expand_3D<dim>(F);
 	 F_3D[enums::theta][enums::theta] = 1. + radial_u/radial_x;
+//	 const double s=5;
+//	 const double w=1;
+//	 F_3D[enums::theta][enums::theta] = 1. + radial_u/radial_x * (std::tanh(s*radial_x-w)+std::tanh(w)) / (1.+std::tanh(w));
 
 	return F_3D;
 }
