@@ -145,12 +145,75 @@ SymmetricTensor<2,dim> extract_theta ( const SymmetricTensor<4,3> &symTensor_3D 
 
     return symTensor_theta;
 }
+template<int dim>
+Tensor<2,dim> extract_theta ( const Tensor<4,3> &Tensor_3D )
+{
+	Tensor<2,dim> Tensor_theta;
+	for ( unsigned int i=0; i<dim; ++i )
+		for ( unsigned int j=0; j<dim; ++j )
+			Tensor_theta[i][j] = Tensor_3D[i][j][enums::theta][enums::theta];
+
+    return Tensor_theta;
+}
+
+template<int dim>
+SymmetricTensor<2,dim> extract_theta_secondPair ( const SymmetricTensor<4,3> &symTensor_3D )
+{
+	SymmetricTensor<2,dim> symTensor_theta;
+	for ( unsigned int i=0; i<dim; ++i )
+		for ( unsigned int j=i; j<dim; ++j )
+			symTensor_theta[i][j] = symTensor_3D[enums::theta][enums::theta][i][j];
+
+    return symTensor_theta;
+}
+template<int dim>
+Tensor<2,dim> extract_theta_secondPair ( const Tensor<4,3> &Tensor_3D )
+{
+	Tensor<2,dim> Tensor_theta;
+	for ( unsigned int i=0; i<dim; ++i )
+		for ( unsigned int j=0; j<dim; ++j )
+			Tensor_theta[i][j] = Tensor_3D[enums::theta][enums::theta][i][j];
+
+    return Tensor_theta;
+}
+
+template<int dim>
+SymmetricTensor<2,dim> extract_comps_secondPair ( const SymmetricTensor<4,dim> &symTensor_3D, const unsigned int i, const unsigned int j )
+{
+	SymmetricTensor<2,dim> symTensor_theta;
+	for ( unsigned int k=0; k<dim; ++k )
+		for ( unsigned int l=k; l<dim; ++l )
+			symTensor_theta[k][l] = symTensor_3D[i][j][k][l];
+
+    return symTensor_theta;
+}
+template<int dim>
+Tensor<2,dim> extract_comps_secondPair ( const Tensor<4,dim> &Tensor_3D, const unsigned int i, const unsigned int j )
+{
+	Tensor<2,dim> Tensor_theta;
+	for ( unsigned int k=0; k<dim; ++k )
+		for ( unsigned int l=0; l<dim; ++l )
+			Tensor_theta[k][l] = Tensor_3D[i][j][k][l];
+
+    return Tensor_theta;
+}
 
 
 template <int dim>
 double get_radial_x( const FEValues<dim> &fe_values_ref, const unsigned int &current_QP )
 {
 	return (fe_values_ref.quadrature_point(current_QP)[enums::r]);
+}
+/**
+ * @todo try to merge FEValues and FEFaceValues cases
+ * @param fe_values_ref
+ * @param current_QP
+ * @return
+ */
+template <int dim>
+double get_radial_x( const FEFaceValues<dim> &fe_face_values_ref, const unsigned int &current_QP )
+{
+	return (fe_face_values_ref.quadrature_point(current_QP)[enums::r]);
 }
 
 
@@ -181,6 +244,25 @@ double get_JxW ( const unsigned int &type_2D, const FEValues<dim> &fe_values_ref
 	}
 	else
 		return fe_values_ref.JxW(current_QP);
+}
+/**
+ * @todo Try to merge the FEValues and FEFaceValue
+ * @param type_2D
+ * @param fe_face_values_ref
+ * @param current_QP
+ * @return
+ */
+template<int dim>
+double get_JxW ( const unsigned int &type_2D, const FEFaceValues<dim> &fe_face_values_ref, const unsigned int &current_QP )
+{
+	if ( dim==2 && enums::enum_type_2D(type_2D)==enums::axiSym )
+	{
+		const double radial_x = get_radial_x<dim>(fe_face_values_ref,current_QP);
+		// 2 * pi * r: pi = 4 * arctan(1 rad)
+		return (fe_face_values_ref.JxW(current_QP) * (2. * (4.*std::atan(1.)) * radial_x));
+	}
+	else
+		return fe_face_values_ref.JxW(current_QP);
 }
 
 
@@ -338,11 +420,67 @@ SymmetricTensor<2,dim> get_dS_theta_axisym_fstrain( const SymmetricTensor<2,dim>
 	const double radial_x = get_radial_x<dim>(fe_values_ref,current_QP);
 
 	double dCtheta_dur = 2. * ( 1. + radial_u / radial_x ) / radial_x;
-	// deformed configuration?
-//	double dCtheta_dur = 2. * ( radial_x + 2.*radial_u ) * radial_x / std::pow(radial_u+radial_x,3);
 
 	return Tangent_theta * dCtheta_dur * shape_fnc_j_u;
 }
+
+template<int dim>
+SymmetricTensor<2,dim> get_dS_theta_dF_axisym_fstrain( const Tensor<2,dim> &Tangent_theta,
+		  	  	  	  	  	  	  	  	  	  	 	const FEValues<dim> &fe_values_ref, const Vector<double> &current_solution,
+												 	const unsigned int current_QP, const unsigned int j )
+{
+	double shape_fnc_j_u = fe_values_ref[(FEValuesExtractors::Vector) 0].value(j,current_QP)[enums::u];
+	const double radial_u = get_radial_u<dim>(current_solution, fe_values_ref, current_QP);
+	const double radial_x = get_radial_x<dim>(fe_values_ref,current_QP);
+
+	double dFtheta_dur = 1. / radial_x;
+
+	return symmetrize( Tangent_theta * dFtheta_dur * shape_fnc_j_u );
+}
+
+
+// cell_rhs(i) -= ( R + u_r ) / std::pow( R,2 ) * shape_fnc_i_u[0] * stress_S_3D[2][2] * JxW;
+// Equivalent spatial description: cell_rhs(i) -= 1. / ( R + u_r ) * shape_fnc_i_u[0] * Cauchy_stress_3D[2][2] * determinant(DefoGradient_3D) * JxW;
+double get_axisym_residual_contribution( const double &R, const double &u_r, const SymmetricTensor<2,3> &stress_S_3D,
+										 const double &shape_fnc_i_u, const double &JxW )
+{
+	return ( R + u_r ) / std::pow( R,2 ) * shape_fnc_i_u * stress_S_3D[enums::theta][enums::theta] * JxW;
+}
+
+
+template<int dim>
+double get_axisym_linearisation_contribution( const double &R, const double &u_r,
+											  const SymmetricTensor<2,3> &stress_S_3D, const Tensor<2,dim> &deltaF,
+											  const Tensor<2,dim> &d_S_thetatheta_d_F, const double &Tangent_theta_theta,
+											  const double &shape_fnc_i_u, const double &shape_fnc_j_u, const double &JxW )
+{
+	return shape_fnc_i_u / std::pow( R,2 )
+		   * (
+				 ( stress_S_3D[enums::theta][enums::theta]  ) * shape_fnc_j_u
+				 + (R + u_r)
+				   * (
+						   double_contract<0,0,1,1>( d_S_thetatheta_d_F, deltaF )
+						 + Tangent_theta_theta * shape_fnc_j_u / R
+					 )
+		   )   * JxW;
+}
+template<int dim>
+double get_axisym_linearisation_contribution( const double &R, const double &u_r,
+											  const SymmetricTensor<2,3> &stress_S_3D, const SymmetricTensor<2,dim> &deltaRCG,
+											  const SymmetricTensor<2,dim> &d_S_thetatheta_d_C, const double &Tangent_theta_theta,
+											  const double &shape_fnc_i_u, const double &shape_fnc_j_u, const double &JxW )
+{
+	return shape_fnc_i_u / std::pow( R,2 )
+		   * (
+				 ( stress_S_3D[enums::theta][enums::theta]  ) * shape_fnc_j_u
+				 + (R + u_r)
+				   * (
+						 d_S_thetatheta_d_C * deltaRCG
+						 + Tangent_theta_theta * 2. * ( 1. + u_r / R ) / R * shape_fnc_j_u
+					 )
+		     ) * JxW;
+}
+
 
 
 //template<int dim>
