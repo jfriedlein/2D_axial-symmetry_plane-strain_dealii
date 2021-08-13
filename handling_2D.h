@@ -447,7 +447,19 @@ double get_axisym_residual_contribution( const double &R, const double &u_r, con
 	return ( R + u_r ) / std::pow( R,2 ) * shape_fnc_i_u * stress_S_3D[enums::theta][enums::theta] * JxW;
 }
 
-
+/**
+ * with deltaF
+ * @param R
+ * @param u_r
+ * @param stress_S_3D
+ * @param deltaF
+ * @param d_S_thetatheta_d_F
+ * @param Tangent_theta_theta
+ * @param shape_fnc_i_u
+ * @param shape_fnc_j_u
+ * @param JxW
+ * @return
+ */
 template<int dim>
 double get_axisym_linearisation_contribution( const double &R, const double &u_r,
 											  const SymmetricTensor<2,3> &stress_S_3D, const Tensor<2,dim> &deltaF,
@@ -464,6 +476,19 @@ double get_axisym_linearisation_contribution( const double &R, const double &u_r
 					 )
 		   )   * JxW;
 }
+/**
+ * with deltaC
+ * @param R
+ * @param u_r
+ * @param stress_S_3D
+ * @param deltaRCG
+ * @param d_S_thetatheta_d_C
+ * @param Tangent_theta_theta
+ * @param shape_fnc_i_u
+ * @param shape_fnc_j_u
+ * @param JxW
+ * @return
+ */
 template<int dim>
 double get_axisym_linearisation_contribution( const double &R, const double &u_r,
 											  const SymmetricTensor<2,3> &stress_S_3D, const SymmetricTensor<2,dim> &deltaRCG,
