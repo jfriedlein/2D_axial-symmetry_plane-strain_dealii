@@ -56,9 +56,9 @@ The 2D displacement gradient computed from the displacement field (components u 
 
 To sum up, radial displacements u_r produce tangential strains eps_theta = u_r / r.
 
-Additionally, the tangential stress contributes to the residual, which results from the gradient operator in cylindrical coordinates. Please note that cylindrical coordinates and derivatives in this frame can be very non-intuitive and require careful consideration. A complete derivation can be found in the pdf xxx on page 1 and 2 with some additional theory on page 5-10.
+Additionally, the tangential stress contributes to the residual, which results from the gradient operator in cylindrical coordinates. Please note that cylindrical coordinates and derivatives in this frame can be very non-intuitive and require careful consideration. A complete derivation can be found in the pdf [axisymmetric element formulation - summary](https://github.com/jfriedlein/2D_axial-symmetry_plane-strain_dealii/blob/master/axisymmetric%20element%20formulation%20-%20summary_Friedlein.pdf) on page 1 and 2 with some additional theory on page 5-10.
 	
-This renders the axisymmetric weak form as follows (in the spatial configuration, for details see pdf xxx):
+This renders the axisymmetric weak form as follows (in the spatial configuration, for details see pdf [axisymmetric element formulation - summary](https://github.com/jfriedlein/2D_axial-symmetry_plane-strain_dealii/blob/master/axisymmetric%20element%20formulation%20-%20summary_Friedlein.pdf)):
 	
 <img src="https://latex.codecogs.com/svg.image?\int_{\mathcal{B}_t}&space;\nabla_\text{2D}&space;\boldsymbol{N}^\text{2D}&space;:&space;\boldsymbol{\sigma}^\text{2D}&space;&plus;&space;\frac{1}{r}&space;N^r&space;\sigma_{\theta&space;\theta}&space;\text{d}&space;v&space;=&space;0" title="\int_{\mathcal{B}_t} \nabla_\text{2D} \boldsymbol{N}^\text{2D} : \boldsymbol{\sigma}^\text{2D} + \frac{1}{r} N^r \sigma_{\theta \theta} \text{d} v = 0" />
 	
