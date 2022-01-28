@@ -24,12 +24,14 @@ namespace enums
       * 2D model types:
       * - plane strain: uses the 3D material models but sets all out-of-plane strains to zero for the input
       * - axisymmetric: for axial symmetry, which requires a special out-of-plane strain or deformation gradient component
+      * - plane stress: for instance requires additional iterations to satisfy the no normal stress condition
       * (see <a href="https://github.com/jfriedlein/2D_axial-symmetry_plane-strain_dealii">2D axial symmetry and plane strain</a>)
       */
       enum enum_type_2D
  	 {
  		 planeStrain = 0,//!< planeStrain
- 		 axiSym = 1      //!< axiSym
+ 		 axiSym = 1,      //!< axiSym
+ 		 planeStress = 2 //!< planeStress
  	 };
 }
 
